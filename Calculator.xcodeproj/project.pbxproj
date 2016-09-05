@@ -54,14 +54,22 @@
 		108C787F1D77385C00322A91 /* Calculator */ = {
 			isa = PBXGroup;
 			children = (
-				108C78801D77385C00322A91 /* AppDelegate.swift */,
+				108C78921D788C5E00322A91 /* Supporting Files */,
 				108C78821D77385C00322A91 /* ViewController.swift */,
 				108C78841D77385C00322A91 /* Main.storyboard */,
+			);
+			path = Calculator;
+			sourceTree = "<group>";
+		};
+		108C78921D788C5E00322A91 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				108C78801D77385C00322A91 /* AppDelegate.swift */,
 				108C78871D77385C00322A91 /* Assets.xcassets */,
 				108C78891D77385C00322A91 /* LaunchScreen.storyboard */,
 				108C788C1D77385C00322A91 /* Info.plist */,
 			);
-			path = Calculator;
+			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -96,6 +104,7 @@
 				TargetAttributes = {
 					108C787C1D77385B00322A91 = {
 						CreatedOnToolsVersion = 7.3.1;
+						DevelopmentTeam = 2UK26NDGSG;
 					};
 				};
 			};
@@ -251,6 +260,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = Calculator/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = edu.stanford.cs193p.omeryetik.Calculator;
@@ -262,6 +272,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = Calculator/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = edu.stanford.cs193p.omeryetik.Calculator;
