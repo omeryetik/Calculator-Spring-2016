@@ -17,10 +17,16 @@ class ViewController: UIViewController {
     @IBAction private func touchDigitButton(sender: UIButton) {
         let digit = sender.currentTitle!
         if userIsInTheMiddleOfTyping {
-            let textCurrentlyInDisplay = display.text!
-            display.text = textCurrentlyInDisplay + digit
+            // Assignment #1: Required Task #1:
+            // If the displayed number already has a "." and user entered a "." again, don't do anything.
+            if !(digit == "." && (display.text!.rangeOfString(".") != nil)) {
+                let textCurrentlyInDisplay = display.text!
+                display.text = textCurrentlyInDisplay + digit
+            }
         } else {
-            display.text = digit
+            // Assignment #1: Required Task #1:
+            // User just started entering a number. If it starts with a ".", append 0 at the beginning
+            display.text = digit == "." ? "0." : digit
         }
         userIsInTheMiddleOfTyping = true
     }
