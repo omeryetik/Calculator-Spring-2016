@@ -10,8 +10,14 @@ import UIKit
 
 class ViewController: UIViewController {
 
-    @IBOutlet private weak var display: UILabel!
+    private struct Constants {
+        static let DecimalDigits = 6
+    }
     
+    @IBOutlet private weak var display: UILabel!
+    // Assignment #1, Required Task #6
+    @IBOutlet weak var history: UILabel!
+    //
     private var userIsInTheMiddleOfTyping = false
 
     @IBAction private func touchDigitButton(sender: UIButton) {
@@ -32,12 +38,27 @@ class ViewController: UIViewController {
     }
     
     // A computed property (Swift) to keep displayed value in Double
-    private var displayValue: Double {
+    // Assignment #1, Extra Task #2 : Changed to Optional
+    // Assignment #1, Extra Task #3 : NSNumberFormatter lines added
+    private var displayValue: Double? {
         get {
-            return Double(display.text!)!
+            if let text = display.text,
+                value = NSNumberFormatter().numberFromString(text)?.doubleValue {
+                return value
+            }
+            return nil
         }
         set {
-            display.text = String(newValue)
+            if let value = newValue {
+                let formatter = NSNumberFormatter()
+                formatter.numberStyle = .DecimalStyle
+                formatter.maximumFractionDigits = Constants.DecimalDigits
+                display.text = formatter.stringFromNumber(value)
+                history.text = brain.description + (brain.isPartialResult ? " ..." : " =")
+            } else {
+                display.text = "0"
+                history.text = " "
+            }
         }
     }
 
@@ -45,13 +66,36 @@ class ViewController: UIViewController {
     
     @IBAction private func performOperation(sender: UIButton) {
         if userIsInTheMiddleOfTyping {
-            brain.setOperand(displayValue)
+            brain.setOperand(displayValue!)
             userIsInTheMiddleOfTyping = false
         }
         if let mathematicalSymbol = sender.currentTitle {
             brain.performOperation(mathematicalSymbol)
         }
         displayValue = brain.result
+    }
+    
+    // Assignment #1, Required Task #8
+    @IBAction private func clear() {
+        brain = CalculatorBrain()
+        display.text = "0"
+        history.text = " "
+        // Assignment #1, Extra Task #2
+        displayValue = nil
+    }
+    
+    // Assignment #1, Extra Task #1
+    @IBAction func backSpace() {
+        if userIsInTheMiddleOfTyping {
+            if var text = display.text {
+                text.removeAtIndex(text.endIndex.predecessor())
+                if text.isEmpty {
+                    text = "0"
+                    userIsInTheMiddleOfTyping = false
+                }
+                display.text = text
+            }
+        }
     }
 }
 
