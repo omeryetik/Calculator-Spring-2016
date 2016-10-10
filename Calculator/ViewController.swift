@@ -75,7 +75,7 @@ class ViewController: UIViewController {
         displayValue = brain.result
     }
     
-    // Assignment #1, Required Task #8
+    // Assignment #1, Required Task #8 
     @IBAction private func clear() {
         brain = CalculatorBrain()
         display.text = "0"
