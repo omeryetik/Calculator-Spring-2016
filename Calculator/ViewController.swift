@@ -19,23 +19,6 @@ class ViewController: UIViewController {
     @IBOutlet weak var history: UILabel!
     //
     private var userIsInTheMiddleOfTyping = false
-
-    @IBAction private func touchDigitButton(sender: UIButton) {
-        let digit = sender.currentTitle!
-        if userIsInTheMiddleOfTyping {
-            // Assignment #1: Required Task #1:
-            // If the displayed number already has a "." and user entered a "." again, don't do anything.
-            if !(digit == "." && (display.text!.rangeOfString(".") != nil)) {
-                let textCurrentlyInDisplay = display.text!
-                display.text = textCurrentlyInDisplay + digit
-            }
-        } else {
-            // Assignment #1: Required Task #1:
-            // User just started entering a number. If it starts with a ".", append 0 at the beginning
-            display.text = digit == "." ? "0." : digit
-        }
-        userIsInTheMiddleOfTyping = true
-    }
     
     // A computed property (Swift) to keep displayed value in Double
     // Assignment #1, Extra Task #2 : Changed to Optional
@@ -62,6 +45,23 @@ class ViewController: UIViewController {
         }
     }
 
+    @IBAction private func touchDigitButton(sender: UIButton) {
+        let digit = sender.currentTitle!
+        if userIsInTheMiddleOfTyping {
+            // Assignment #1: Required Task #1:
+            // If the displayed number already has a "." and user entered a "." again, don't do anything.
+            if !(digit == "." && (display.text!.rangeOfString(".") != nil)) {
+                let textCurrentlyInDisplay = display.text!
+                display.text = textCurrentlyInDisplay + digit
+            }
+        } else {
+            // Assignment #1: Required Task #1:
+            // User just started entering a number. If it starts with a ".", append 0 at the beginning
+            display.text = digit == "." ? "0." : digit
+        }
+        userIsInTheMiddleOfTyping = true
+    }
+    
     private var brain = CalculatorBrain()
     
     @IBAction private func performOperation(sender: UIButton) {
@@ -75,9 +75,30 @@ class ViewController: UIViewController {
         displayValue = brain.result
     }
     
+    // Assignment #2, Required Task #8 (A2RT8)
+    //
+    // Button "→M" : sets the variable M to the displayed value
+    @IBAction func setVariable(sender: AnyObject) {
+        if userIsInTheMiddleOfTyping {
+            brain.variableValues["M"] = displayValue
+            userIsInTheMiddleOfTyping = false
+            displayValue = brain.result
+        }
+    }
+    
+    
+    // Button "M" : gets the value of the variable M
+    @IBAction func getVariable(sender: AnyObject) {
+        brain.setOperand("M")
+        displayValue = brain.result
+    }
+
+    
+    //
+    
     // Assignment #1, Required Task #8 
     @IBAction private func clear() {
-        brain = CalculatorBrain()
+        brain.clear()
         display.text = "0"
         history.text = " "
         // Assignment #1, Extra Task #2

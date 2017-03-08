@@ -14,6 +14,32 @@ func multiply(op1: Double, op2: Double) -> Double {
 
 class CalculatorBrain {
     
+    private var accumulator = 0.0
+    private var internalProgram = [AnyObject]()
+    
+    func setOperand(operand: Double) {
+        accumulator = operand
+        internalProgram.append(operand)
+        accumulatorDescription = String(format: "%g", operand)
+    }
+    
+    // Assignment #2, Required Task #4 (RT4)
+    //
+    var variableValues = [String:Double]() {
+        // When variable values are updated, rerun the program...
+        didSet {
+            program = internalProgram
+        }
+    }
+    
+    func setOperand(variableName: String) {
+        accumulator = variableValues[variableName] ?? 0.0
+        internalProgram.append(variableName)
+        accumulatorDescription = variableName
+    }
+    
+    //
+    
     // Assignment #1, Required Task #5
     //
     var description: String {
@@ -49,13 +75,6 @@ class CalculatorBrain {
         }
     }
     //
-    
-    private var accumulator = 0.0
-    
-    func setOperand(operand: Double) {
-        accumulator = operand
-        accumulatorDescription = String(format: "%g", operand)
-    }
     
     // Extensible table to keep operation list
     private var operations: Dictionary<String,Operation> = [
@@ -99,6 +118,7 @@ class CalculatorBrain {
     }
     
     func performOperation(symbol: String) {
+        internalProgram.append(symbol)
         if let operation = operations[symbol] {
             switch operation {
             case .Constant(let value):
@@ -140,6 +160,36 @@ class CalculatorBrain {
         var firstOperandDescription: String
     }
     
+    // PropertyList declaration of program variable from Lecture #3
+    typealias PropertyList = AnyObject
+    
+    var program: PropertyList {
+        get {
+            return internalProgram
+        }
+        set {
+            clear()
+            if let arrayOfOps = newValue as? [AnyObject] {
+                for op in arrayOfOps {
+                    if let operand = op as? Double {
+                        setOperand(operand)
+                    } else if let symbol = op as? String {
+                        if operations[symbol] != nil {
+                            performOperation(symbol)
+                        } else if variableValues[symbol] != nil {
+                            setOperand(symbol)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    func clear() {
+        accumulator = 0.0
+        pending = nil
+        internalProgram.removeAll()
+    }
     
     var result: Double {
         get {
