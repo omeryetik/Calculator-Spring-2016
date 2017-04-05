@@ -10,9 +10,17 @@ import UIKit
 
 class ViewController: UIViewController {
 
-    private struct Constants {
-        static let DecimalDigits = 6
+    // Assignment #1, Extra Task #3 : NSNumberFormatter lines added
+    private var formatter: NSNumberFormatter {
+        get {
+            let formatter = NSNumberFormatter()
+            formatter.minimumFractionDigits = 0
+            formatter.maximumFractionDigits = 6
+            formatter.minimumIntegerDigits = 1
+            return formatter
+        }
     }
+    // 
     
     @IBOutlet private weak var display: UILabel!
     // Assignment #1, Required Task #6
@@ -26,25 +34,22 @@ class ViewController: UIViewController {
     private var displayValue: Double? {
         get {
             if let text = display.text,
-                value = NSNumberFormatter().numberFromString(text)?.doubleValue {
+                value = formatter.numberFromString(text)?.doubleValue {
                 return value
             }
             return nil
         }
         set {
             if let value = newValue {
-                let formatter = NSNumberFormatter()
-                formatter.numberStyle = .DecimalStyle
-                formatter.maximumFractionDigits = Constants.DecimalDigits
                 display.text = formatter.stringFromNumber(value)
-                history.text = brain.description + (brain.isPartialResult ? " ..." : " =")
+                history.text = brain.description + (brain.isPartialResult ? " ..." : brain.description.characters.count > 0 ? " =" : " ")
             } else {
                 display.text = "0"
                 history.text = " "
             }
         }
     }
-
+ 
     @IBAction private func touchDigitButton(sender: UIButton) {
         let digit = sender.currentTitle!
         if userIsInTheMiddleOfTyping {
@@ -58,8 +63,8 @@ class ViewController: UIViewController {
             // Assignment #1: Required Task #1:
             // User just started entering a number. If it starts with a ".", append 0 at the beginning
             display.text = digit == "." ? "0." : digit
+            userIsInTheMiddleOfTyping = true
         }
-        userIsInTheMiddleOfTyping = true
     }
     
     private var brain = CalculatorBrain()
@@ -92,17 +97,16 @@ class ViewController: UIViewController {
         brain.setOperand("M")
         displayValue = brain.result
     }
-
-    
     //
     
     // Assignment #1, Required Task #8 
     @IBAction private func clear() {
         brain.clear()
-        display.text = "0"
-        history.text = " "
         // Assignment #1, Extra Task #2
         displayValue = nil
+        // Assignment #2, Required Task #9 (A2RT9), Clear values for the variable M
+        brain.variableValues["M"] = nil
+        
     }
     
     // Assignment #1, Extra Task #1
@@ -115,6 +119,13 @@ class ViewController: UIViewController {
                     userIsInTheMiddleOfTyping = false
                 }
                 display.text = text
+            }
+        } else { // Assignment #2, Required Task #10 (A2RT10) : Undo function
+            if let lastNumberOperand = brain.undo() {
+                displayValue = lastNumberOperand
+                userIsInTheMiddleOfTyping = true
+            } else {
+                displayValue = brain.result
             }
         }
     }

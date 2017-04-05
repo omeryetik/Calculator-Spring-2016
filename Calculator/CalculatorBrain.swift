@@ -31,20 +31,22 @@ class CalculatorBrain {
         internalProgram.append(operand)
     }
     
-    // Assignment #2, Required Task #4 (RT4)
+    // Assignment #2, Required Task #4 (A2RT4)
     //
     var variableValues = [String:Double]() {
-        // When variable values are updated, rerun the program...
+        // When variable values are updated, rerun the program, to reflect the changes,
+        // as per RT5 in Assignment #2. (A2RT5)
         didSet {
             program = internalProgram
         }
     }
     
+    // setOperand(:) function which takes a variable name (String) as an argument.
+    // Note that there occurs another function with the same name, which takes a Double as argument.
     func setOperand(variableName: String) {
         accumulator = variableValues[variableName] ?? 0.0
         internalProgram.append(variableName)
     }
-    
     //
     
     // Assignment #1, Required Task #5
@@ -60,32 +62,36 @@ class CalculatorBrain {
             for item in internalProgram {
                 if let operand = item as? Double {
                     lastItem = formatter.stringFromNumber(operand)
-                } else if let symbol = item as? String, operation = operations[symbol] {
-                    switch operation {
-                    case .Constant(let symbol, _):
-                        lastItem = symbol
-                    case .NullaryOperation(let symbol, _):
-                        lastItem = nil
-                        partialDescriotion += symbol + "(" + ")"
-                    case .UnaryOperation(let symbol, _):
-                        if lastItem != nil {
-                            partialDescriotion += symbol + "(" + lastItem! + ")"
+                } else if let symbol = item as? String {
+                    if let operation = operations[symbol] {
+                        switch operation {
+                        case .Constant(let symbol, _):
+                            lastItem = symbol
+                        case .NullaryOperation(let symbol, _):
                             lastItem = nil
-                        } else {
-                            partialDescriotion = symbol + "(" + partialDescriotion + ")"
-                        }
-                    case .BinaryOperation(let symbol, _, let precedence):
-                        partialDescriotion += (lastItem ?? "")
-                        if partialDescriotion != "" {
-                            if currentPrecedence < precedence {
-                                partialDescriotion = "(" + partialDescriotion + ")"
+                            partialDescriotion += symbol + "(" + ")"
+                        case .UnaryOperation(let symbol, _):
+                            if lastItem != nil {
+                                partialDescriotion += symbol + "(" + lastItem! + ")"
+                                lastItem = nil
+                            } else {
+                                partialDescriotion = symbol + "(" + partialDescriotion + ")"
                             }
+                        case .BinaryOperation(let symbol, _, let precedence):
+                            partialDescriotion += (lastItem ?? "")
+                            if partialDescriotion != "" {
+                                if currentPrecedence < precedence {
+                                    partialDescriotion = "(" + partialDescriotion + ")"
+                                }
+                            }
+                            partialDescriotion += " " + symbol + " "
+                            currentPrecedence = precedence
+                        case .Equals:
+                            partialDescriotion += lastItem ?? ""
+                            lastItem = nil
                         }
-                        partialDescriotion += " " + symbol + " "
-                        currentPrecedence = precedence
-                    case .Equals:
-                        partialDescriotion += lastItem ?? ""
-                        lastItem = nil
+                    } else {
+                        lastItem = symbol
                     }
                 } else {
                     print("Unable to process \(lastItem)")
@@ -141,7 +147,7 @@ class CalculatorBrain {
         // Assignment #1, Extra Task #4
         "rand" : Operation.NullaryOperation("rand", drand48)
     ]
-    
+     
     private enum Operation {
         case Constant(String, Double)
         case NullaryOperation(String, () -> Double)
@@ -191,15 +197,15 @@ class CalculatorBrain {
             return internalProgram
         }
         set {
-            clear()
             if let arrayOfOps = newValue as? [AnyObject] {
+                clear()
                 for op in arrayOfOps {
                     if let operand = op as? Double {
                         setOperand(operand)
                     } else if let symbol = op as? String {
                         if operations[symbol] != nil {
                             performOperation(symbol)
-                        } else if variableValues[symbol] != nil {
+                        } else {
                             setOperand(symbol)
                         }
                     }
@@ -213,6 +219,22 @@ class CalculatorBrain {
         pending = nil
         internalProgram.removeAll()
     }
+    
+    //
+    // Assignment #2 Required Task #10 (A2RT10): Undo function
+    //
+    func undo() -> Double? {
+        var lastNumberOperand: Double? = 0.0
+        if !internalProgram.isEmpty {
+            internalProgram.removeLast()
+            if internalProgram.last as? Double != nil {
+                lastNumberOperand = internalProgram.removeLast() as? Double
+            }
+            program = internalProgram
+        }
+        return lastNumberOperand
+    }
+    //
     
     var result: Double {
         get {
